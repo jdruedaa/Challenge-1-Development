@@ -13,29 +13,33 @@ fun main()
     val ancho = size[1]
     var arboles = listOf<Int>()
     var actual : NodoArboles
-    var id = 1
+    var id = 0
     var valor = 0
     var posicion = Pair(0,0)
     val compararNodoPorValor : Comparator<NodoArboles> = compareByDescending {it.valor}
     var nodosPriorizados = PriorityQueue(alto*ancho, compararNodoPorValor)
     var nodos = mutableListOf<NodoArboles>()
-    var edges = mutableListOf<NodoArboles>()
+    //var edges = mutableListOf<NodoArboles>()
     while(i<alto)
     {
         arboles = In.readLine()!!.split(" ").map { it.toInt() }
         while (j < ancho)
         {
+            valor = arboles[j]
             posicion = Pair(i,j)
-            valor = arboles[j].toInt()
             actual = NodoArboles(id, valor, posicion)
             nodos.add(actual)
-            nodosPriorizados.add(actual)
+            if(valor >= 0)
+            {
+                nodosPriorizados.add(actual)
+            }
             j++
             id++
         }
         i++
         j = 0
     }
+    var respuesta = calculateAnswer(nodosPriorizados, nodos)
     nodos.map { println(it.toStringNA()) }
     println("-----")
     /**i = 0
@@ -46,4 +50,20 @@ fun main()
         i++
     }
     */
+}
+
+//Implementación actual solo podrá encontrar los mejores caminos para cada nodo, no todos los caminos posibles
+fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : MutableList<NodoArboles>): Array<MutableList<Pair<Int, String>>?> {
+    var nodoActual : NodoArboles
+    var vecinoActual : NodoArboles
+    var caminos = arrayOfNulls<MutableList<Pair<Int, String>>>(nodos.size)
+    var id : Int
+    while(!nodosPriorizados.isEmpty())
+    {
+        nodoActual = nodosPriorizados.remove()
+        id = nodoActual.id
+
+        //if(nodos.get(id+1) != null && )
+    }
+    return caminos
 }
