@@ -28,6 +28,22 @@ fun main()
             valor = arboles[j]
             posicion = Pair(i,j)
             actual = NodoArboles(id, valor, posicion)
+            if(j>0)
+            {
+                actual.edges.add(id-1)
+            }
+            if(j<ancho-1)
+            {
+                actual.edges.add(id+1)
+            }
+            if(i>0)
+            {
+                actual.edges.add(id-ancho)
+            }
+            if(i<alto-1)
+            {
+                actual.edges.add(id+ancho)
+            }
             nodos.add(actual)
             if(valor >= 0)
             {
@@ -40,8 +56,23 @@ fun main()
         j = 0
     }
     var respuesta = calculateAnswer(nodosPriorizados, nodos)
-    nodos.map { println(it.toStringNA()) }
+    println("Steepest path length: ${respuesta.first}")
+    println("List of paths:")
+    println(respuesta.second)
+    var caminos = respuesta.third
+    var caminoActual : String
+    while(!caminos.isEmpty())
+    {
+        caminoActual = caminos.remove()
+        if(caminoActual.equals(""))
+        {
+            break
+        }
+        println(caminoActual)
+    }
     println("-----")
+    //nodos.map { println(it.toStringNA()) }
+    //println("-----")
     /**i = 0
     println(nodosPriorizados.peek().toStringNA())
     while(i<200)
@@ -52,18 +83,109 @@ fun main()
     */
 }
 
-//Implementación actual solo podrá encontrar los mejores caminos para cada nodo, no todos los caminos posibles
-fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : MutableList<NodoArboles>): Array<MutableList<Pair<Int, String>>?> {
+/*ToDo Implementación actual solo podrá encontrar los mejores caminos para cada nodo, no todos los caminos posibles
+   Para eso hay que encontrar los mejores caminos en cada dirección y guardarlos, luego borrar si se encuentra un nodo más abajo
+*/
+fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : MutableList<NodoArboles>): Triple<Int, String, PriorityQueue<String>>
+        //MutableList<String>
+        //MutableList<MutableList<Pair<Int, String>>?>
+{
     var nodoActual : NodoArboles
     var vecinoActual : NodoArboles
-    var caminos = arrayOfNulls<MutableList<Pair<Int, String>>>(nodos.size)
+    //var caminos = mutableListOf<MutableList<Pair<Int, String>>>()
+    //var caminos = mutableListOf<String>()
+    //ToDo optimizar última comparación (doble recorrido de string en realidad es necesario?)
+    val compararCamino : Comparator<String> = compareByDescending<String> {it.split("-").size}.thenByDescending { calculateSteepness(it) }
+        .thenByDescending { it.substringBefore("-").toInt() }
+    var caminos = PriorityQueue<String>(nodosPriorizados.size,compararCamino)
+    /*for (i in 0..nodos.size)
+    {
+        caminos.add("")
+    }*/
     var id : Int
+    var valor : Int
+    var valorVecino : Int
+    var edges : MutableList<Int>
+    var longitudMax : Int
+    var longitudMaxVecino : Int
+    var longitudMaxGlobal = -1
+    var mejorCamino : String
+    var mejorCaminoVecino : String
+    var mejorCaminoGlobal = ""
+    var inclinacionMejorCamino : Int
+    var inclinacionMejorCaminoVecino : Int
+    var inclinacionMejorCaminoGlobal = -1
     while(!nodosPriorizados.isEmpty())
     {
         nodoActual = nodosPriorizados.remove()
         id = nodoActual.id
-
-        //if(nodos.get(id+1) != null && )
+        valor = nodoActual.valor
+        longitudMax = nodoActual.longitudMax
+        edges = nodoActual.edges
+        mejorCamino = nodoActual.mejorCamino
+        for(edge in edges)
+        {
+            vecinoActual = nodos[edge]
+            valorVecino = vecinoActual.valor
+            longitudMaxVecino = vecinoActual.longitudMax
+            mejorCaminoVecino = vecinoActual.mejorCamino
+            if(valor < valorVecino)
+            {
+                if(longitudMaxVecino > longitudMax || longitudMax == 1)
+                {
+                    longitudMax = longitudMaxVecino + 1
+                    nodoActual.longitudMax = longitudMax
+                    mejorCamino = "$mejorCaminoVecino-$valor"
+                    nodoActual.mejorCamino = mejorCamino
+                }
+                else if(longitudMaxVecino == longitudMax) {
+                    inclinacionMejorCamino = calculateSteepness(mejorCamino)
+                    inclinacionMejorCaminoVecino = calculateSteepness(mejorCaminoVecino)
+                    if (inclinacionMejorCaminoVecino > inclinacionMejorCamino)
+                    {
+                        mejorCamino = "$mejorCaminoVecino-$valor"
+                        nodoActual.mejorCamino = mejorCamino
+                    }
+                }
+            }
+        }
+        //caminos[id] = mejorCamino
+        if(longitudMax > longitudMaxGlobal)
+        {
+            longitudMaxGlobal = longitudMax
+            caminos.add(mejorCaminoGlobal)
+            mejorCaminoGlobal = mejorCamino
+            inclinacionMejorCaminoGlobal = calculateSteepness(mejorCamino)
+        }
+        else if(longitudMax == longitudMaxGlobal) {
+            inclinacionMejorCamino = calculateSteepness(mejorCamino)
+            if (inclinacionMejorCamino > inclinacionMejorCaminoGlobal)
+            {
+                caminos.add(mejorCaminoGlobal)
+                mejorCaminoGlobal = mejorCamino
+                inclinacionMejorCaminoGlobal = inclinacionMejorCamino
+            }
+        }
+        else
+        {
+            caminos.add(mejorCamino)
+        }
     }
-    return caminos
+    //ToDo quitar subcaminos
+    return Triple(longitudMaxGlobal, mejorCaminoGlobal, caminos)
+}
+
+fun calculateSteepness(camino : String) : Int
+{
+    //ToDo Optimizable?
+    var inclinacion = -1
+    if(camino != "")
+    {
+        //var final = camino.substringBefore("-").toInt()
+        //var inicio = camino.substringAfterLast("-").toInt()
+        var nums = camino.split("-").map { it.toInt() }
+        inclinacion = nums[0] - nums[nums.size-1]
+        //inclinacion = final - inicio
+    }
+    return inclinacion
 }
