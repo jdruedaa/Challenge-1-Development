@@ -1,0 +1,28 @@
+By Diego Iván López
+
+-Primera fila: Longitud y ancho del mapa (row - column)
+-No se mueven en diagonal
+-Mayor número igual mayor altura?
+-El camino más largo es el mejor
+-En caso de empate:
+--Distancia vertical se mide con la diferencia entre el menor número y el mayor número del camino
+--Mayor distancia es preferido
+
+-Hay sustentación y hablar de complejidades para hallar la respuesta más óptima
+-Hablar de razonamiento, aspectos técnicos tomados en cuenta y explicar solución
+-Imprimir todos los caminos encontrados (no solo los mejores)
+-
+
+Solutions: 
+-Grafo viendo caminos
+-Recorrer matriz paso a paso
+
+-Guardar caminos
+-Hacer threads por punto de inicio?
+
+-Hacer un repo para el reto
+
+Pista: Entrevistas de google
+
+-Solo se considera complejidad de algoritmo de búsqueda, no de creación de estructuras
+-Cuenta personal de github is ok
