@@ -8,10 +8,10 @@ fun main()
 {
     //val In = BufferedReader(InputStreamReader(System.`in`))
     //ToDo add selección de opción: solo mejor camino o mejor camino por nodo
-    val In = File("./Docs/map.txt").bufferedReader()
+    val entrada = File("./Docs/map.txt").bufferedReader()
     var i = 0
     var j = 0
-    val size = In.readLine()!!.split(" ").map { it.toInt() }
+    val size = entrada.readLine()!!.split(" ").map { it.toInt() }
     val alto = size[0]
     val ancho = size[1]
     var arboles = listOf<Int>()
@@ -25,7 +25,7 @@ fun main()
     //var edges = mutableListOf<NodoArboles>()
     while(i<alto)
     {
-        arboles = In.readLine()!!.split(" ").map { it.toInt() }
+        arboles = entrada.readLine()!!.split(" ").map { it.toInt() }
         while (j < ancho)
         {
             valor = arboles[j]
@@ -289,3 +289,4 @@ fun calculateAnswerWithPaths(nodosPriorizados : PriorityQueue<NodoArboles>,  nod
     return Triple(longitudMaxGlobal, mejorCaminoGlobal, caminos)
     //return Pair(longitudMaxGlobal, mejorCaminoGlobal)
 }
+
