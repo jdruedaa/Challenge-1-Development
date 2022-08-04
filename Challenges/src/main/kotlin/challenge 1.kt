@@ -1,11 +1,13 @@
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.util.Comparator
 import java.util.PriorityQueue
 
 fun main()
 {
-    val In = BufferedReader(InputStreamReader(System.`in`))
+    //val In = BufferedReader(InputStreamReader(System.`in`))
+    val In = File("./Docs/map.txt").bufferedReader()
     var i = 0
     var j = 0
     val size = In.readLine()!!.split(" ").map { it.toInt() }
@@ -59,7 +61,7 @@ fun main()
     println("Steepest path length: ${respuesta.first}")
     println("List of paths:")
     println(respuesta.second)
-    var caminos = respuesta.third
+    /*Old caminos: var caminos = respuesta.third
     var caminoActual : String
     while(!caminos.isEmpty())
     {
@@ -71,6 +73,7 @@ fun main()
         println(caminoActual)
     }
     println("-----")
+    */
     //nodos.map { println(it.toStringNA()) }
     //println("-----")
     /**i = 0
@@ -86,7 +89,8 @@ fun main()
 /*ToDo Implementación actual solo podrá encontrar los mejores caminos para cada nodo, no todos los caminos posibles
    Para eso hay que encontrar los mejores caminos en cada dirección y guardarlos, luego borrar si se encuentra un nodo más abajo
 */
-fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : MutableList<NodoArboles>): Triple<Int, String, PriorityQueue<String>>
+fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : MutableList<NodoArboles>): Pair<Int, String>
+        //Old caminos: Triple<Int, String, PriorityQueue<String>>
         //MutableList<String>
         //MutableList<MutableList<Pair<Int, String>>?>
 {
@@ -95,9 +99,10 @@ fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : Muta
     //var caminos = mutableListOf<MutableList<Pair<Int, String>>>()
     //var caminos = mutableListOf<String>()
     //ToDo optimizar última comparación (doble recorrido de string en realidad es necesario?)
-    val compararCamino : Comparator<String> = compareByDescending<String> {it.split("-").size}.thenByDescending { calculateSteepness(it) }
+    /*Old caminos: val compararCamino : Comparator<String> = compareByDescending<String> {it.split("-").size}.thenByDescending { calculateSteepness(it) }
         .thenByDescending { it.substringBefore("-").toInt() }
     var caminos = PriorityQueue<String>(nodosPriorizados.size,compararCamino)
+    */
     /*for (i in 0..nodos.size)
     {
         caminos.add("")
@@ -153,7 +158,7 @@ fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : Muta
         if(longitudMax > longitudMaxGlobal)
         {
             longitudMaxGlobal = longitudMax
-            caminos.add(mejorCaminoGlobal)
+            //Old caminos: caminos.add(mejorCaminoGlobal)
             mejorCaminoGlobal = mejorCamino
             inclinacionMejorCaminoGlobal = calculateSteepness(mejorCamino)
         }
@@ -161,18 +166,19 @@ fun calculateAnswer(nodosPriorizados : PriorityQueue<NodoArboles>,  nodos : Muta
             inclinacionMejorCamino = calculateSteepness(mejorCamino)
             if (inclinacionMejorCamino > inclinacionMejorCaminoGlobal)
             {
-                caminos.add(mejorCaminoGlobal)
+                //Old caminos: caminos.add(mejorCaminoGlobal)
                 mejorCaminoGlobal = mejorCamino
                 inclinacionMejorCaminoGlobal = inclinacionMejorCamino
             }
         }
         else
         {
-            caminos.add(mejorCamino)
+            //Old caminos: caminos.add(mejorCamino)
         }
     }
     //ToDo quitar subcaminos
-    return Triple(longitudMaxGlobal, mejorCaminoGlobal, caminos)
+    //Old caminos: return Triple(longitudMaxGlobal, mejorCaminoGlobal, caminos)
+    return Pair(longitudMaxGlobal, mejorCaminoGlobal)
 }
 
 fun calculateSteepness(camino : String) : Int
