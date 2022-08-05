@@ -1,9 +1,8 @@
-import java.awt.List;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.FileWriter;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Challenge_1
 {
@@ -17,6 +16,32 @@ public class Challenge_1
     {
         //val In = BufferedReader(InputStreamReader(System.`in`))
         //ToDo add selección de opción: solo mejor camino o mejor camino por nodo
+        Scanner in = new Scanner(System.in);
+        String inputOpcion;
+        int opcion;
+        while(true)
+        {
+            System.out.println("Elija la opción que desea:\n1. Encontrar el mejor camino e imprimirlo en consola.\n" +
+                    "2. Encontrar el mejor camino y los mejores caminos partiendo desde cada posición. Crear un archivo con el resultado");
+            inputOpcion = in.nextLine();
+            try
+            {
+                opcion = Integer.parseInt(inputOpcion);
+                if(opcion == 1 || opcion == 2)
+                {
+                    break;
+                }
+                else
+                {
+                    System.out.println("Opción no válida, debe ingresar 1 o 2 para elegir una opción.");
+                }
+            }
+            catch(Exception e)
+            {
+                System.out.println("Opción no válida, debe ingresar 1 o 2 para elegir una opción.");
+            }
+        }
+        in.close();
         try
         {
             BufferedReader entrada = new BufferedReader(new FileReader("./Docs/map.txt"));
@@ -71,26 +96,38 @@ public class Challenge_1
                 i++;
                 j = 0;
             }
-            String[] respuesta = calculateAnswer(nodosPriorizados, nodos);
-            System.out.println("Steepest path length: " + respuesta[0]);
-            System.out.println("List of paths:");
-            System.out.println(respuesta[1]);
-            //ToDo escribir a archivo en caso de pedir caminos
-            /*List caminos: i = 1
-            var caminos = respuesta.third
-            var caminoActual : String
-            while(i < caminos.size)
+            entrada.close();
+            if(opcion == 1)
             {
-                caminoActual = caminos[i]
-                if(caminoActual.equals(""))
+                String[] respuesta = calculateAnswer(nodosPriorizados, nodos);
+                System.out.println("Steepest path length: " + respuesta[0]);
+                System.out.println("List of paths:");
+                System.out.println(respuesta[1]);
+            }
+            else if(opcion == 2)
+            {
+                AbstractMap.SimpleEntry<String[], ArrayList<String>> respuesta = calculateAnswerWithPaths(nodosPriorizados, nodos);
+                String[] mejorCamino = respuesta.getKey();
+                ArrayList<String> caminos = respuesta.getValue();
+                System.out.println("Construyendo documento...");
+                BufferedWriter escritor = new BufferedWriter(new FileWriter("./Docs/bestPaths.txt", false));
+                escritor.write("Steepest path length: " + mejorCamino[0]);
+                escritor.newLine();
+                escritor.write("List of paths:");
+                escritor.newLine();
+                escritor.write(mejorCamino[1]);
+                for(String camino : caminos)
                 {
-                    break
+                    escritor.newLine();
+                    escritor.write(camino);
                 }
-                println(caminoActual)
-                i++
-            }*/
-
-
+                escritor.close();
+                System.out.println("Documento completado, podrá encontrarlo en la carpeta Docs como bestPaths.txt");
+            }
+            else
+            {
+                System.out.println("No se eligió una opción válida para retornar datos.");
+            }
             /*Old caminos: var caminos = respuesta.third
             var caminoActual : String
             while(!caminos.isEmpty())
@@ -209,6 +246,84 @@ public class Challenge_1
             //inclinacion = final - inicio
         }
             return inclinacion;
+    }
+
+    public AbstractMap.SimpleEntry<String[], ArrayList<String>> calculateAnswerWithPaths(PriorityQueue<NodoArbolesJava> nodosPriorizados, ArrayList<NodoArbolesJava> nodos)
+    {
+        NodoArbolesJava nodoActual;
+        NodoArbolesJava vecinoActual;
+        int id;
+        int valor;
+        int valorVecino;
+        ArrayList<Integer> edges;
+        ArrayList<String> mejoresCaminos = new ArrayList<>();
+        int longitudMax;
+        int longitudMaxVecino;
+        int longitudMaxGlobal = -1;
+        String mejorCamino;
+        String mejorCaminoVecino;
+        String mejorCaminoGlobal = "";
+        int inclinacionMejorCamino;
+        int inclinacionMejorCaminoVecino;
+        int inclinacionMejorCaminoGlobal = -1;
+        while(!nodosPriorizados.isEmpty())
+        {
+            nodoActual = nodosPriorizados.remove();
+            id = nodoActual.getId();
+            valor = nodoActual.getValor();
+            longitudMax = nodoActual.longitudMax;
+            edges = nodoActual.edges;
+            mejorCamino = nodoActual.mejorCamino;
+            for(int edge: edges)
+            {
+                vecinoActual = nodos.get(edge);
+                valorVecino = vecinoActual.getValor();
+                longitudMaxVecino = vecinoActual.longitudMax;
+                mejorCaminoVecino = vecinoActual.mejorCamino;
+                if(valor < valorVecino)
+                {
+                    if(longitudMaxVecino > longitudMax || longitudMax == 1)
+                    {
+                        longitudMax = longitudMaxVecino + 1;
+                        nodoActual.longitudMax = longitudMax;
+                        mejorCamino = "" + mejorCaminoVecino + "-" + valor;
+                        nodoActual.mejorCamino = mejorCamino;
+                    }
+                    else if(longitudMaxVecino == longitudMax) {
+                        inclinacionMejorCamino = calculateSteepness(mejorCamino);
+                        inclinacionMejorCaminoVecino = calculateSteepness(mejorCaminoVecino);
+                        if (inclinacionMejorCaminoVecino > inclinacionMejorCamino);
+                        {
+                            mejorCamino = "" + mejorCaminoVecino + "-" + valor;
+                            nodoActual.mejorCamino = mejorCamino;
+                        }
+                    }
+                }
+            }
+            //caminos[id] = mejorCamino
+            if(longitudMax > longitudMaxGlobal)
+            {
+                longitudMaxGlobal = longitudMax;
+                mejoresCaminos.add(mejorCaminoGlobal);
+                mejorCaminoGlobal = mejorCamino;
+                inclinacionMejorCaminoGlobal = calculateSteepness(mejorCamino);
+            }
+            else if(longitudMax == longitudMaxGlobal) {
+                inclinacionMejorCamino = calculateSteepness(mejorCamino);
+                if (inclinacionMejorCamino > inclinacionMejorCaminoGlobal)
+                {
+                    mejoresCaminos.add(mejorCaminoGlobal);
+                    mejorCaminoGlobal = mejorCamino;
+                    inclinacionMejorCaminoGlobal = inclinacionMejorCamino;
+                }
+            }
+            else
+            {
+                mejoresCaminos.add(mejorCamino);
+            }
+        }
+        String[] respuesta = {"" + longitudMaxGlobal, mejorCaminoGlobal};
+        return new AbstractMap.SimpleEntry<>(respuesta,mejoresCaminos);
     }
 
 }
