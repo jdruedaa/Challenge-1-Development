@@ -235,17 +235,17 @@ public class Challenge_1
 
     public int calculateSteepness(String camino)
     {
-        //ToDo Optimizable?
-        var inclinacion = -1;
+        int inclinacion = -1;
         if(camino != "")
         {
-            //var final = camino.substringBefore("-").toInt()
-            //var inicio = camino.substringAfterLast("-").toInt()
-            int[] nums = Arrays.stream(camino.split("-")).mapToInt(it -> Integer.parseInt(it)).toArray();
-            inclinacion = nums[0] - nums[nums.length-1];
-            //inclinacion = final - inicio
+            int fin = Integer.parseInt(camino.substring(0,camino.indexOf("-")));
+            int inicio = Integer.parseInt(camino.substring(camino.lastIndexOf("-")));
+            //Optimized
+            //int[] nums = Arrays.stream(camino.split("-")).mapToInt(it -> Integer.parseInt(it)).toArray();
+            //inclinacion = nums[0] - nums[nums.length-1];
+            inclinacion = fin - inicio;
         }
-            return inclinacion;
+        return inclinacion;
     }
 
     public AbstractMap.SimpleEntry<String[], ArrayList<String>> calculateAnswerWithPaths(PriorityQueue<NodoArbolesJava> nodosPriorizados, ArrayList<NodoArbolesJava> nodos)
