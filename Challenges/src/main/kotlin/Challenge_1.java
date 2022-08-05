@@ -106,9 +106,9 @@ public class Challenge_1
             }
             else if(opcion == 2)
             {
-                AbstractMap.SimpleEntry<String[], ArrayList<String>> respuesta = calculateAnswerWithPaths(nodosPriorizados, nodos);
+                AbstractMap.SimpleEntry<String[], PriorityQueue<String>> respuesta = calculateAnswerWithPaths(nodosPriorizados, nodos);
                 String[] mejorCamino = respuesta.getKey();
-                ArrayList<String> caminos = respuesta.getValue();
+                PriorityQueue<String> caminos = respuesta.getValue();
                 System.out.println("Construyendo documento...");
                 BufferedWriter escritor = new BufferedWriter(new FileWriter("./Docs/bestPaths.txt", false));
                 escritor.write("Steepest path length: " + mejorCamino[0]);
@@ -116,10 +116,10 @@ public class Challenge_1
                 escritor.write("List of paths:");
                 escritor.newLine();
                 escritor.write(mejorCamino[1]);
-                for(String camino : caminos)
+                while(!caminos.isEmpty())
                 {
                     escritor.newLine();
-                    escritor.write(camino);
+                    escritor.write(caminos.remove());
                 }
                 escritor.close();
                 System.out.println("Documento completado, podrá encontrarlo en la carpeta Docs como bestPaths.txt");
@@ -245,7 +245,7 @@ public class Challenge_1
                 int indexFinal = camino.lastIndexOf("-");
                 if(indexFinal != -1)
                 {
-                    int inicio = Integer.parseInt(camino.substring(camino.lastIndexOf("-")));
+                    int inicio = Integer.parseInt(camino.substring(camino.lastIndexOf("-")+1));
                     inclinacion = fin - inicio;
                 }
             }
@@ -260,7 +260,7 @@ public class Challenge_1
         return inclinacion;
     }
 
-    public AbstractMap.SimpleEntry<String[], ArrayList<String>> calculateAnswerWithPaths(PriorityQueue<NodoArbolesJava> nodosPriorizados, ArrayList<NodoArbolesJava> nodos)
+    public AbstractMap.SimpleEntry<String[], PriorityQueue<String>> calculateAnswerWithPaths(PriorityQueue<NodoArbolesJava> nodosPriorizados, ArrayList<NodoArbolesJava> nodos)
     {
         NodoArbolesJava nodoActual;
         NodoArbolesJava vecinoActual;
@@ -268,7 +268,10 @@ public class Challenge_1
         int valor;
         int valorVecino;
         ArrayList<Integer> edges;
-        ArrayList<String> mejoresCaminos = new ArrayList<>();
+        Comparator compararCamino = Comparator.comparingInt((String s) -> (s.split("-").length)).reversed().
+                thenComparingInt((String s) -> (calculateSteepness(s)));
+        PriorityQueue mejoresCaminos = new PriorityQueue(nodosPriorizados.size(), compararCamino);
+        //ArrayList<String> mejoresCaminos = new ArrayList<>();
         int longitudMax;
         int longitudMaxVecino;
         int longitudMaxGlobal = -1;
