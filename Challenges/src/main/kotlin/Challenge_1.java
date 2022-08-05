@@ -238,12 +238,24 @@ public class Challenge_1
         int inclinacion = -1;
         if(camino != "")
         {
-            int fin = Integer.parseInt(camino.substring(0,camino.indexOf("-")));
-            int inicio = Integer.parseInt(camino.substring(camino.lastIndexOf("-")));
+            int indexInicial = camino.indexOf("-");
+            if(indexInicial != -1)
+            {
+                int fin = Integer.parseInt(camino.substring(0,indexInicial));
+                int indexFinal = camino.lastIndexOf("-");
+                if(indexFinal != -1)
+                {
+                    int inicio = Integer.parseInt(camino.substring(camino.lastIndexOf("-")));
+                    inclinacion = fin - inicio;
+                }
+            }
+            else
+            {
+                inclinacion = 0;
+            }
             //Optimized
             //int[] nums = Arrays.stream(camino.split("-")).mapToInt(it -> Integer.parseInt(it)).toArray();
             //inclinacion = nums[0] - nums[nums.length-1];
-            inclinacion = fin - inicio;
         }
         return inclinacion;
     }
